@@ -1,8 +1,12 @@
+require('dotenv').config();
+require('express-async-errors');
 const express = require('express');
 const app = express();
-const task = require('./routes/task');
+
 const connectDB = require('./db/connect');
-require('dotenv').config();
+const authenticateUser = require('./middleware/authentication');
+const authRouter = require('./routes/auth');
+const task = require('./routes/task');
 const notFound = require('./middleware/not-found');
 const errorHandler = require('./middleware/error-handler');
 
@@ -12,13 +16,16 @@ app.use(express.json());
 
 //routes
 
-// app.get('/', (req, res) => {
+// app.get('/api/v1/auth/register', (req, res) => {
 //   res.send('hello');
 // });
-app.use('/api/v1/tasks', task);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/tasks', authenticateUser, task);
+
 app.use(notFound);
-app.use(errorHandler);
-const port = process.env.port || 8080;
+// console.log("err")
+// app.use(errorHandler);
+const port = process.env.port || 5000;
 
 const start = async () => {
   try {
@@ -31,3 +38,4 @@ const start = async () => {
   }
 };
 start();
+
